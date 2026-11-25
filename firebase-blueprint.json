@@ -1,0 +1,159 @@
+{
+  "entities": {
+    "ShopProfile": {
+      "title": "ShopProfile",
+      "description": "Retail shop profile and settings scoped to the authenticated owner UID.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "Firebase Auth UID of shop owner" },
+        "shopName": { "type": "string", "description": "Display name of the shop" },
+        "phone": { "type": "string", "description": "Optional shop phone number" },
+        "language": { "type": "string", "enum": ["rw", "en", "fr"], "description": "Preferred UI language" },
+        "monthlyReceiptLimit": { "type": "integer", "description": "Configurable monthly AI receipt scan limit" },
+        "receiptsUsedThisMonth": { "type": "integer", "description": "Count of AI receipts parsed in receiptMonthKey" },
+        "receiptMonthKey": { "type": "string", "description": "YYYY-MM month key in Africa/Kigali" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Server timestamp on creation" },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "Server timestamp on update" }
+      },
+      "required": ["userId", "shopName", "language", "monthlyReceiptLimit", "receiptsUsedThisMonth", "receiptMonthKey", "createdAt", "updatedAt"]
+    },
+    "Product": {
+      "title": "Product",
+      "description": "Retail inventory product definition.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "name": { "type": "string" },
+        "unit": { "type": "string", "enum": ["piece", "kg", "carton", "sack", "bottle", "liter", "pack"] },
+        "buyingPrice": { "type": "integer" },
+        "normalPrice": { "type": "integer" },
+        "minStockLevel": { "type": "integer" },
+        "cachedStock": { "type": "integer" },
+        "supplierName": { "type": "string" },
+        "active": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "name", "unit", "buyingPrice", "normalPrice", "minStockLevel", "cachedStock", "active", "createdAt", "updatedAt"]
+    },
+    "StockMovement": {
+      "title": "StockMovement",
+      "description": "Immutable append-only stock movement ledger entry.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "productId": { "type": "string" },
+        "type": { "type": "string", "enum": ["bought", "sold", "adjusted", "cancelled"] },
+        "quantityDelta": { "type": "integer" },
+        "unitCost": { "type": "integer" },
+        "reason": { "type": "string" },
+        "relatedId": { "type": "string" },
+        "dateKey": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "productId", "type", "quantityDelta", "unitCost", "dateKey", "createdAt"]
+    },
+    "Sale": {
+      "title": "Sale",
+      "description": "Point-of-sale transaction locking buyingPriceAtSale.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "productId": { "type": "string" },
+        "productName": { "type": "string" },
+        "quantity": { "type": "integer" },
+        "unitPrice": { "type": "integer" },
+        "buyingPriceAtSale": { "type": "integer" },
+        "totalAmount": { "type": "integer" },
+        "profitAmount": { "type": "integer" },
+        "paymentMethod": { "type": "string", "enum": ["cash", "momo", "credit"] },
+        "status": { "type": "string", "enum": ["completed", "cancelled"] },
+        "customerName": { "type": "string" },
+        "dateKey": { "type": "string" },
+        "monthKey": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "productId", "productName", "quantity", "unitPrice", "buyingPriceAtSale", "totalAmount", "profitAmount", "paymentMethod", "status", "dateKey", "monthKey", "createdAt", "updatedAt"]
+    },
+    "Debt": {
+      "title": "Debt",
+      "description": "Customer credit (owed_to_me) or supplier debt (i_owe).",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "direction": { "type": "string", "enum": ["owed_to_me", "i_owe"] },
+        "partyName": { "type": "string" },
+        "partyPhone": { "type": "string" },
+        "description": { "type": "string" },
+        "originalAmount": { "type": "integer" },
+        "paidAmount": { "type": "integer" },
+        "status": { "type": "string", "enum": ["open", "paid", "cancelled"] },
+        "dueDateKey": { "type": "string" },
+        "relatedSaleId": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "direction", "partyName", "originalAmount", "paidAmount", "status", "createdAt", "updatedAt"]
+    },
+    "DebtPayment": {
+      "title": "DebtPayment",
+      "description": "Immutable payment applied toward a Debt.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "debtId": { "type": "string" },
+        "amount": { "type": "integer" },
+        "method": { "type": "string", "enum": ["cash", "momo"] },
+        "dateKey": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "debtId", "amount", "method", "dateKey", "createdAt"]
+    },
+    "ReceiptRecord": {
+      "title": "ReceiptRecord",
+      "description": "Immutable record of confirmed wholesale receipt import.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "supplierName": { "type": "string" },
+        "itemCount": { "type": "integer" },
+        "totalAmount": { "type": "integer" },
+        "paymentMethod": { "type": "string", "enum": ["cash", "momo", "credit"] },
+        "monthKey": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "itemCount", "totalAmount", "paymentMethod", "monthKey", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/shops/{shopId}": {
+      "schema": "ShopProfile",
+      "description": "Shop profile owned by shopId == request.auth.uid"
+    },
+    "/shops/{shopId}/products/{productId}": {
+      "schema": "Product",
+      "description": "Products belonging to the shop"
+    },
+    "/shops/{shopId}/stockMovements/{movementId}": {
+      "schema": "StockMovement",
+      "description": "Immutable append-only stock ledger"
+    },
+    "/shops/{shopId}/sales/{saleId}": {
+      "schema": "Sale",
+      "description": "Sales transactions belonging to the shop"
+    },
+    "/shops/{shopId}/debts/{debtId}": {
+      "schema": "Debt",
+      "description": "Customer credits and supplier debts"
+    },
+    "/shops/{shopId}/debtPayments/{paymentId}": {
+      "schema": "DebtPayment",
+      "description": "Immutable debt repayments"
+    },
+    "/shops/{shopId}/receipts/{receiptId}": {
+      "schema": "ReceiptRecord",
+      "description": "Immutable imported wholesale receipts"
+    }
+  }
+}

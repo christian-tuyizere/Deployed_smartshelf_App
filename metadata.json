@@ -1,0 +1,6 @@
+{
+  "name": "SmartShelf",
+  "description": "Offline-first retail inventory, sales, real-time gross profit, customer/supplier credits, and AI wholesale receipt scanner in RWF.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
